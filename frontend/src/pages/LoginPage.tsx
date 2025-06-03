@@ -1,98 +1,95 @@
 // --- frontend/src/pages/LoginPage.tsx ---
-// This file will now handle Google OAuth 2.0 directly.
 import React, { useState } from 'react';
-import { Chrome } from 'lucide-react'; // Import Chrome icon from lucide-react
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'; // Google OAuth components
-import axios from 'axios'; // For making HTTP requests to your backend
+// Removed Chrome icon as it's not used. If you want a generic brand icon, consider one from Lucide.
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import axios from 'axios';
+import { ShieldCheck } from 'lucide-react'; // Using a different icon for branding
 
 interface LoginPageProps {
   onLoginSuccess: (userData: { name: string; email: string; photoURL?: string }) => void;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; // Get backend URL from environment variables
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const [loginError, setLoginError] = useState<string | null>(null); // State for displaying login errors
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  /**
-   * Handles the successful credential response from Google.
-   * Sends the ID token to the backend for verification and authentication.
-   */
   const handleCredentialResponse = async (response: CredentialResponse) => {
-  setLoginError(null);
-  if (response.credential) {
-    try {
-      const backendResponse = await axios.post(`${BACKEND_URL}/api/auth/google-auth`, {
-        id_token: response.credential,
-      });
+    setLoginError(null);
+    if (response.credential) {
+      try {
+        const backendResponse = await axios.post(`${BACKEND_URL}/api/auth/google-auth`, {
+          id_token: response.credential,
+        });
 
-      if (backendResponse.data?.token) {
-        // Store token
-        localStorage.setItem('token', backendResponse.data.token);
-        
-        // Immediately verify token works
-        try {
-          const userResponse = await axios.get(`${BACKEND_URL}/api/auth/verify`, {
-            headers: {
-              Authorization: `Bearer ${backendResponse.data.token}`
-            }
-          });
-          
-          onLoginSuccess({
-            name: userResponse.data.user.name,
-            email: userResponse.data.user.email,
-            photoURL: userResponse.data.user.picture,
-          });
-          console.log(userResponse.data.user.picture);
+        if (backendResponse.data?.token) {
+          localStorage.setItem('token', backendResponse.data.token);
+          // Fetch user details from the backend after successful token exchange
+          // This ensures user data is sourced from your trusted backend.
+          try {
+            const userResponse = await axios.get(`${BACKEND_URL}/api/auth/verify`, { // Assuming /verify returns user data
+              headers: {
+                Authorization: `Bearer ${backendResponse.data.token}`
+              }
+            });
 
-        } catch (verifyError) {
-          localStorage.removeItem('token');
-          setLoginError('Failed to verify session');
+            const userData = {
+              name: userResponse.data.user.name,
+              email: userResponse.data.user.email,
+              photoURL: userResponse.data.user.picture,
+            };
+            onLoginSuccess(userData);
+
+          } catch (verifyError) {
+            console.error('Session verification failed:', verifyError);
+            localStorage.removeItem('token');
+            setLoginError('Failed to verify session. Please try again.');
+          }
+        } else {
+          setLoginError(backendResponse.data?.message || 'Authentication failed - no token received from backend.');
         }
-      } else {
-        setLoginError('Authentication failed - no token received');
+      } catch (error: any) {
+        console.error('Login error during backend token exchange:', error);
+        setLoginError(error.response?.data?.message || 'Login failed due to a server error.');
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setLoginError(error.response?.data?.message || 'Login failed');
+    } else {
+      setLoginError('No credential received from Google. Please try again.');
     }
-  }
-};
+  };
 
-
-
-  /**
-   * Handles errors from the Google Login component itself.
-   */
   const handleGoogleLoginError = () => {
-    setLoginError('Google login failed. Please ensure you have a stable internet connection and try again.');
+    setLoginError('Google login process failed. Please check your internet connection or browser settings and try again.');
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-sky-800 p-4">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-2xl text-center">
-        <div>
-          <h1 className="text-4xl font-bold text-sky-700">Welcome to Mini CRM</h1>
-          <p className="mt-2 text-gray-600">Please sign in to continue.</p>
+    // Using a slightly softer gradient and ensuring text contrast
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-sky-900 p-4">
+      <div className="w-full max-w-md p-8 md:p-10 space-y-8 bg-white rounded-xl shadow-2xl text-center">
+        <div className="flex flex-col items-center">
+          <ShieldCheck className="w-16 h-16 text-sky-600 mb-4" /> {/* Modern Icon */}
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800">Welcome to Mini CRM</h1>
+          <p className="mt-2 text-slate-600">Securely sign in with your Google account.</p>
         </div>
 
-        {/* GoogleLogin component will render the actual Google Sign-In button */}
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleCredentialResponse}
             onError={handleGoogleLoginError}
-            useOneTap // Enable Google One Tap for a smoother experience
-            // You can customize the button appearance here if needed, e.g., theme="filled_blue"
+            useOneTap
+            theme="filled_blue" // Explicitly using a standard theme
+            shape="rectangular" // Consistent button shape
+            width="300px" // Fixed width for consistency
           />
         </div>
 
         {loginError && (
-          <p className="text-red-600 bg-red-100 border border-red-300 rounded-lg p-3 text-sm">
-            {loginError}
-          </p>
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+            <p className="font-medium">Login Error</p>
+            <p className="text-sm">{loginError}</p>
+          </div>
         )}
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-slate-500 pt-4 border-t border-slate-200">
           Built for Xeno SDE Internship Assignment.
         </p>
       </div>
