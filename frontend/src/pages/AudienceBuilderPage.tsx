@@ -1,6 +1,6 @@
 // pages/AudienceBuilderPage.tsx
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, Trash2, Filter, Users, Save, ChevronRight, ChevronLeft, History } from 'lucide-react';
+import { PlusCircle, Trash2, Users, Save, ChevronRight, ChevronLeft, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api.ts';
 

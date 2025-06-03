@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Users, ArrowUpDown, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import {  XCircle, Users, ArrowUpDown, Loader2 } from 'lucide-react';
 import api from '../api';
 
 interface Campaign {
@@ -19,7 +18,6 @@ interface Campaign {
 }
 
 // API Base URL (adjust for backend port if needed)
-const API_BASE_URL = 'http://localhost:5000';
 
 const CampaignHistoryPage: React.FC = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
