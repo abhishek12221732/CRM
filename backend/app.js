@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const audienceRoutes = require('./routes/audienceRoutes');
 const campaignRoutes = require('./routes/campaignRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const {errorHandlerMiddleware} = require('./utils/errors');
 require('dotenv').config(); 
 
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/audience', audienceRoutes);
 app.use('/api/campaign', campaignRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Error Handler
 app.use(errorHandlerMiddleware);

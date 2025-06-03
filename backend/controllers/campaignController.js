@@ -34,11 +34,21 @@ exports.createCampaign = async (req, res) => {
   }
 };
 
+// controllers/campaignController.js
 exports.getCampaigns = async (req, res) => {
   try {
-    const campaigns = await Campaign.find({ createdBy: req.user.id })
+    const limit = parseInt(req.query.limit) || 0;
+    const query = { createdBy: req.user.id };
+    
+    if (limit > 0) {
+      query.limit = limit;
+    }
+
+    const campaigns = await Campaign.find(query)
       .sort({ createdAt: -1 })
+      .limit(limit)
       .populate('segmentId', 'name estimatedSize');
+      
     res.json(campaigns);
   } catch (error) {
     res.status(500).json({ error: error.message });

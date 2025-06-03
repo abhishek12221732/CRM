@@ -5,7 +5,6 @@ interface HeaderProps {
   user: { name: string; email: string; photoURL?: string } | null;
   onLogout: () => void;
 }
-
 export const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
   return (
     <header className="bg-white shadow-md p-4 flex justify-between items-center">
