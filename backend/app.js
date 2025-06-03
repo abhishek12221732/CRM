@@ -16,11 +16,27 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(express.json());
+
+const allowedOrigins = [
+  'https://crm-front-f60y.onrender.com', 
+  'http://localhost:5173',               
+  'http://localhost:3000'               
+];
+
+// Configure CORS middleware
 app.use(cors({
-  origin: ['http://localhost:5173','https://crm-frontend-sltp.onrender.com', 'https://crm-front-f60y.onrender.com/'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    // AND allow requests from explicitly defined allowedOrigins
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true); // Allow the request
+    } else {
+      callback(new Error('Not allowed by CORS')); // Block the request
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+  credentials: true, // If your frontend sends cookies/auth headers (e.g., with Axios 'withCredentials: true')
+  optionsSuccessStatus: 204 // Some older browsers or specific setups might need this
 }));
 app.use(express.json());
 
