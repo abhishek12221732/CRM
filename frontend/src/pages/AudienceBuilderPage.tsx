@@ -168,9 +168,7 @@ const AudienceBuilderPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
+
 
 return (
     <div className="max-w-4xl mx-auto px-4 py-4 text-black"> {/* Added text-black here */}
