@@ -46,6 +46,8 @@ const AudienceBuilderPage: React.FC = () => {
     { id: 'daysSinceLastPurchase', name: 'Days Since Last Purchase' },
     { id: 'customTags', name: 'Custom Tag' },
   ];
+  console.log(isLoading);
+  console.log(audienceSizePreview);
 
   const operators: Record<string, string[]> = {
     totalSpend: ['>', '<', '=', '>=', '<='],
@@ -155,6 +157,7 @@ const AudienceBuilderPage: React.FC = () => {
         name: `Campaign for ${segmentName}`,
         message: `Hi {name}, here's a special offer just for you!`
       });
+      campaignResponse;
 
       // Show success and refresh campaigns
       alert('Segment and campaign created successfully!');
